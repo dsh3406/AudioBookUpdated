@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">BookCase</string>
+    <string-array name="book_array">
+        <item>"Romeo and Juliet"</item>
+        <item>"The Crossover"</item>
+        <item>"The Woman in the Window"</item>
+        <item>"Booked"</item>
+        <item>"The Hazel Wood"</item>
+        <item>"2666"</item>
+        <item>"Giovanni's Room"</item>
+        <item>"Infinite Jest"</item>
+        <item>"All About Love"</item>
+        <item>"Desert Solitaire"</item>
+    </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
