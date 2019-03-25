@@ -9,7 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 
@@ -17,7 +19,7 @@ import android.widget.SpinnerAdapter;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link BookListFragment.OnFragmentInteractionListener} interface
+ * {@link BookListFragment.BookInterface} interface
  * to handle interaction events.
  * Use the {@link BookListFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -32,7 +34,7 @@ public class BookListFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private OnFragmentInteractionListener mListener;
+    private BookInterface mListener;
 
     public BookListFragment() {
         // Required empty public constructor
@@ -65,7 +67,7 @@ public class BookListFragment extends Fragment {
         }
     }
 
-    Spinner spinner;
+    ListView listView;
     Context c;
 
     @Override
@@ -73,18 +75,26 @@ public class BookListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_book_list, container, false);
 
-        spinner.findViewById(R.id.spinner);
+        listView = v.findViewById(R.id.bookList);
         Resources res = this.getResources();
         final String[] bookList = res.getStringArray(R.array.book_array);
-        spinner.setAdapter(new CustomAdapter(c, bookList));
+        listView.setAdapter(new ArrayAdapter<>(c, android.R.layout.simple_list_item_1, bookList));
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String bookTitle = (String) parent.getItemAtPosition(position);
+                ((BookInterface) c).bookSelected(bookTitle);
+            }
+        });
         return v;
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof BookInterface) {
+            mListener = (BookInterface) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -98,8 +108,8 @@ public class BookListFragment extends Fragment {
         mListener = null;
     }
 
-    public interface OnFragmentInteractionListener {
+    public interface BookInterface {
         // TODO: Update argument type and name
-        void bookSelected(String book);
+        void bookSelected(String bookTitle);
     }
 }
