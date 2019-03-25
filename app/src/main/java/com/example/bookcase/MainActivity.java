@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
                     .replace(R.id.container_1, detailsFragment)
                     .addToBackStack(null)
                     .commit();
-            detailsFragment.displayBook();
+
         } else{
             Bundle bundle = new Bundle();
             bundle.putString("bookTitle", book);

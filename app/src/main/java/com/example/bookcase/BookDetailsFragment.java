@@ -62,17 +62,18 @@ public class BookDetailsFragment extends Fragment {
     }
 
     TextView textView;
+    String bookSelected;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_book_details, container, false);
-        textView = v.findViewById(R.id.bookTitle);
-        return v;
+        View view = inflater.inflate(R.layout.fragment_book_details, container, false);
+        textView = view.findViewById(R.id.bookTitle);
+        return view;
     }
 
     public void displayBook(){
-        String bookSelected = getArguments().getString("bookTitle");
+        bookSelected = getArguments().getString("bookTitle");
         textView.setText(bookSelected);
     }
 
