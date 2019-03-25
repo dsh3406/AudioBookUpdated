@@ -67,16 +67,16 @@ public class BookDetailsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_book_details, container, false);
-        textView = v.findViewById(R.id.bookText);
+        textView = v.findViewById(R.id.bookTitle);
         return v;
     }
 
     public void displayBook(){
-        String bookSelected = getArguments().getString("book");
+        String bookSelected = getArguments().getString("bookTitle");
         textView.setText(bookSelected);
     }
 
-    @Override
+    /*@Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
@@ -85,7 +85,7 @@ public class BookDetailsFragment extends Fragment {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
-    }
+    }*/
 
     @Override
     public void onDetach() {

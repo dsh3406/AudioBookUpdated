@@ -1,6 +1,7 @@
 package com.example.bookcase;
 
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -34,6 +35,21 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
 
     @Override
     public void bookSelected(String book) {
-
+        if(singlePane){
+            Bundle bundle = new Bundle();
+            bundle.putString("bookTitle", book);
+            detailsFragment.setArguments(bundle);
+            FragmentManager fm = getSupportFragmentManager();
+            fm.beginTransaction()
+                    .replace(R.id.container_1, detailsFragment)
+                    .addToBackStack(null)
+                    .commit();
+            detailsFragment.displayBook();
+        } else{
+            Bundle bundle = new Bundle();
+            bundle.putString("bookTitle", book);
+            detailsFragment.setArguments(bundle);
+            detailsFragment.displayBook();
+        }
     }
 }
