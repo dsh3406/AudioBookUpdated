@@ -6,21 +6,19 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ViewPagerFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ViewPagerFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ViewPagerFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -31,21 +29,10 @@ public class ViewPagerFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private OnFragmentInteractionListener mListener;
-
     public ViewPagerFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ViewPagerFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static ViewPagerFragment newInstance(String param1, String param2) {
         ViewPagerFragment fragment = new ViewPagerFragment();
         Bundle args = new Bundle();
@@ -62,58 +49,55 @@ public class ViewPagerFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
     }
 
     ViewPager viewPager;
-    ViewPagerAdapter pagerAdapter;
+    PagerAdapter pagerAdapter;
+    BookDetailsFragment newFragment;
+    TextView textView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_view_pager, container, false);
+        textView = v.findViewById(R.id.textView);
+        textView.setText("Swipe");
         Resources res = this.getResources();
         final String[] bookList = res.getStringArray(R.array.book_array);
+        newFragment = new BookDetailsFragment();
         viewPager = v.findViewById(R.id.viewPager);
-        pagerAdapter = new ViewPagerAdapter(getFragmentManager());
+        pagerAdapter = new PagerAdapter(getChildFragmentManager());
+        for(int j = 0; j < bookList.length; j++){
+            newFragment = BookDetailsFragment.newInstance(bookList[j]);
+            pagerAdapter.add(newFragment);
+        }
+        viewPager.setAdapter(pagerAdapter);
         return v;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+    class PagerAdapter extends FragmentStatePagerAdapter{
+
+        ArrayList<BookDetailsFragment> pagerFragments;
+
+        public PagerAdapter(FragmentManager fm) {
+            super(fm);
+            pagerFragments = new ArrayList<>();
+        }
+
+        public void add(BookDetailsFragment fragment){
+            pagerFragments.add(fragment);
+        }
+
+        @Override
+        public Fragment getItem(int i) {
+            return pagerFragments.get(i);
+        }
+
+        @Override
+        public int getCount() {
+            return pagerFragments.size();
         }
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-    }
 }
