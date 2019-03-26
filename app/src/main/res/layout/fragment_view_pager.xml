@@ -15,5 +15,5 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
-        android:textSize="20sp" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 </FrameLayout>
