@@ -15,6 +15,12 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
 public class BookDetailsFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -60,14 +66,6 @@ public class BookDetailsFragment extends Fragment {
         button = view.findViewById(R.id.button);
         editText = view.findViewById(R.id.searchBar);
 
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String searchBook = editText.getText().toString();
-
-            }
-        });
-
         //displayBook(bookSelected);
 
         return view;
@@ -77,8 +75,60 @@ public class BookDetailsFragment extends Fragment {
         author = bookObj.getAuthor();
         title = bookObj.getTitle(); publishyr = bookObj.getPublished();
         textView.setText(" \"" + title + "\" "); textView.append(", " + author); textView.append(", " + publishyr);
+        textView.setTextSize(23);
         String imageURL = bookObj.getCoverURL();
         Picasso.get().load(imageURL).into(imageView);
+    }
+
+    ArrayList<String> titleArray;
+    ArrayList<String> authorArray;
+    ArrayList<String> publishyrArray;
+    String searchText; JSONObject jsonObject; Book books;
+
+    public void searchBook(final JSONArray bookArray){
+        titleArray = new ArrayList<>(); authorArray = new ArrayList<>(); publishyrArray = new ArrayList<>();
+
+        for(int i = 0; i < bookArray.length(); i++) {
+            try {
+                Log.d("Book Subset", bookArray.get(i).toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                jsonObject = bookArray.getJSONObject(i);
+                String title = jsonObject.getString("title");
+                titleArray.add(title);
+                String author = jsonObject.getString("author");
+                authorArray.add(author);
+                String publishyr = jsonObject.getString("published");
+                publishyrArray.add(publishyr);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchText = editText.getText().toString();
+                Log.d("Title", searchText);
+                for (int i = 0; i < bookArray.length(); i++) {
+                    try {
+                        jsonObject = bookArray.getJSONObject(i);
+                        books = new Book(jsonObject);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    if (searchText.equals(titleArray.get(i))) {
+                        displayBook(books);
+                    } else if (searchText.equals(authorArray.get(i))) {
+                        displayBook(books);
+                    } else if (searchText.equals(publishyrArray.get(i))) {
+                        displayBook(books);
+                    }
+
+                }
+            }
+        });
     }
 
 }

@@ -73,6 +73,7 @@ public class BookListFragment extends Fragment {
         bookList = new ArrayList<>();
         downloadBook();
 
+
         return v;
     }
 
@@ -113,7 +114,7 @@ public class BookListFragment extends Fragment {
                     JSONObject jsonData = bookArray.getJSONObject(i);
                     String title = jsonData.getString("title");
                     bookList.add(title);
-                    Log.d("Book ", bookArray.getString(i));
+                    //Log.d("Book ", bookArray.getString(i));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -133,6 +134,7 @@ public class BookListFragment extends Fragment {
                     ((BookInterface) c).bookSelected(books);
                 }
             });
+            ((BookInterface) c).searchBook(bookArray);
             return false;
         }
     });
@@ -152,5 +154,6 @@ public class BookListFragment extends Fragment {
     public interface BookInterface {
         // TODO: Update argument type and name
         void bookSelected(Book bookObj);
+        void searchBook(JSONArray bookArray);
     }
 }

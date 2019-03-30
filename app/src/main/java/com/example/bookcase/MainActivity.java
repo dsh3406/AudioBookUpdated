@@ -8,6 +8,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import org.json.JSONArray;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
@@ -47,6 +49,11 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     @Override
     public void bookSelected(Book bookObj) {
             detailsFragment.displayBook(bookObj);
+    }
+
+    @Override
+    public void searchBook(JSONArray bookArray) {
+        detailsFragment.searchBook(bookArray);
     }
 
 }
