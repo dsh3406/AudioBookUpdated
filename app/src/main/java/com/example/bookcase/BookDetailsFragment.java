@@ -8,7 +8,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 public class BookDetailsFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
@@ -24,8 +29,10 @@ public class BookDetailsFragment extends Fragment {
         // Required empty public constructor
     }
 
-    TextView textView;
+    TextView textView; Button button;
+    ImageView imageView; EditText editText;
     String bookSelected;
+    String title, author, publishyr;
     public static final String BOOK_KEY = "bookTitle";
 
     public static BookDetailsFragment newInstance(String book) {
@@ -49,14 +56,29 @@ public class BookDetailsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_book_details, container, false);
         textView = view.findViewById(R.id.bookTitle);
+        imageView = view.findViewById(R.id.bookImage);
+        button = view.findViewById(R.id.button);
+        editText = view.findViewById(R.id.searchBar);
 
-        displayBook(bookSelected);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String searchBook = editText.getText().toString();
+
+            }
+        });
+
+        //displayBook(bookSelected);
 
         return view;
     }
 
-    public void displayBook(String bookSelected){
-        //Log.d("Book", bookSelected);
-        textView.setText(bookSelected);
+    public void displayBook(Book bookObj){
+        author = bookObj.getAuthor();
+        title = bookObj.getTitle(); publishyr = bookObj.getPublished();
+        textView.setText(" \"" + title + "\" "); textView.append(", " + author); textView.append(", " + publishyr);
+        String imageURL = bookObj.getCoverURL();
+        Picasso.get().load(imageURL).into(imageView);
     }
+
 }

@@ -4,7 +4,10 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +17,17 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 
 
 /**
@@ -25,14 +39,6 @@ import android.widget.SpinnerAdapter;
  * create an instance of this fragment.
  */
 public class BookListFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private BookInterface mListener;
 
@@ -40,20 +46,9 @@ public class BookListFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment BookListFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static BookListFragment newInstance(String param1, String param2) {
         BookListFragment fragment = new BookListFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -61,14 +56,13 @@ public class BookListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     ListView listView;
     Context c;
+    ArrayList<String> bookList;
+    Book books;
+    JSONArray bookArray;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -76,19 +70,72 @@ public class BookListFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_book_list, container, false);
 
         listView = v.findViewById(R.id.bookList);
-        Resources res = this.getResources();
-        final String[] bookList = res.getStringArray(R.array.book_array);
-        listView.setAdapter(new ArrayAdapter<>(c, android.R.layout.simple_list_item_1, bookList));
+        bookList = new ArrayList<>();
+        downloadBook();
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String bookTitle = (String) parent.getItemAtPosition(position);
-                ((BookInterface) c).bookSelected(bookTitle);
-            }
-        });
         return v;
     }
+
+    public void downloadBook() {
+        new Thread() {
+            public void run() {
+                String urlString = "https://kamorris.com/lab/audlib/booksearch.php";
+                try {
+                    URL url = new URL(urlString);
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+                    StringBuilder builder = new StringBuilder();
+                    String tmpString;
+                    while ((tmpString = reader.readLine()) != null) {
+                        builder.append(tmpString);
+                    }
+                    Message msg = Message.obtain();
+                    msg.obj = builder.toString();
+                    urlHandler.sendMessage(msg);
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
+    Handler urlHandler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            try {
+                bookArray = new JSONArray((String) msg.obj);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            for(int i = 0; i < bookArray.length(); i++){
+                try {
+                    JSONObject jsonData = bookArray.getJSONObject(i);
+                    String title = jsonData.getString("title");
+                    bookList.add(title);
+                    Log.d("Book ", bookArray.getString(i));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter(c, android.R.layout.simple_list_item_1, bookList);
+            listView.setAdapter(arrayAdapter);
+
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    try {
+                        books = new Book(bookArray.getJSONObject(position));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    //books = (Book) parent.getItemAtPosition(position);
+                    ((BookInterface) c).bookSelected(books);
+                }
+            });
+            return false;
+        }
+    });
 
     @Override
     public void onAttach(Context context) {
@@ -102,14 +149,8 @@ public class BookListFragment extends Fragment {
         this.c = context;
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
     public interface BookInterface {
         // TODO: Update argument type and name
-        void bookSelected(String bookTitle);
+        void bookSelected(Book bookObj);
     }
 }
