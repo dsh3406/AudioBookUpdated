@@ -61,7 +61,7 @@ public class BookListFragment extends Fragment {
     ListView listView;
     Context c;
     ArrayList<String> bookList;
-    Book books;
+    Book books; Book pagerBook;
     JSONArray bookArray;
 
     @Override
@@ -135,6 +135,15 @@ public class BookListFragment extends Fragment {
                 }
             });
             ((BookInterface) c).searchBook(bookArray);
+
+            for(int j = 0; j < bookArray.length(); j++){
+                try {
+                    pagerBook = new Book(bookArray.getJSONObject(j));
+                    ((BookInterface) c).getBooks(pagerBook);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
             return false;
         }
     });
@@ -155,5 +164,6 @@ public class BookListFragment extends Fragment {
         // TODO: Update argument type and name
         void bookSelected(Book bookObj);
         void searchBook(JSONArray bookArray);
+        void getBooks(Book bookObj);
     }
 }

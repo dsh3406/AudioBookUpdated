@@ -56,4 +56,8 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         detailsFragment.searchBook(bookArray);
     }
 
+    @Override
+    public void getBooks(Book bookObj) {
+        viewPagerFragment.getBooks(bookObj);
+    }
 }

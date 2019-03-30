@@ -13,6 +13,7 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.lang.reflect.Array;
@@ -55,25 +56,25 @@ public class ViewPagerFragment extends Fragment {
     ViewPager viewPager;
     PagerAdapter pagerAdapter;
     BookDetailsFragment newFragment;
-    TextView textView;
+    TextView textView; ImageView imageView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_view_pager, container, false);
-        textView = v.findViewById(R.id.textView);
-        textView.setText("Swipe");
-        Resources res = this.getResources();
-        final String[] bookList = res.getStringArray(R.array.book_array);
+        //textView = v.findViewById(R.id.textView);
+
         newFragment = new BookDetailsFragment();
         viewPager = v.findViewById(R.id.viewPager);
-        pagerAdapter = new PagerAdapter(getChildFragmentManager());
-        for(int j = 0; j < bookList.length; j++){
-            newFragment = BookDetailsFragment.newInstance(bookList[j]);
-            pagerAdapter.add(newFragment);
-        }
-        viewPager.setAdapter(pagerAdapter);
         return v;
+    }
+
+    public void getBooks(Book bookObj){
+        newFragment = BookDetailsFragment.newInstance(bookObj);
+        pagerAdapter.add(newFragment);
+        pagerAdapter = new PagerAdapter(getChildFragmentManager());
+        viewPager.setAdapter(pagerAdapter);
+        pagerAdapter.notifyDataSetChanged();
     }
 
     class PagerAdapter extends FragmentStatePagerAdapter{

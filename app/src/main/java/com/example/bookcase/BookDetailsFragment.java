@@ -39,12 +39,13 @@ public class BookDetailsFragment extends Fragment {
     ImageView imageView; EditText editText;
     String bookSelected;
     String title, author, publishyr;
-    public static final String BOOK_KEY = "bookTitle";
+    public static final String BOOK_KEY = "myBook";
+    Book pagerBooks;
 
-    public static BookDetailsFragment newInstance(String book) {
+    public static BookDetailsFragment newInstance(Book bookList) {
         BookDetailsFragment fragment = new BookDetailsFragment();
         Bundle bundle = new Bundle();
-        bundle.putString(BOOK_KEY, book);
+        bundle.putParcelable(BOOK_KEY, bookList);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -53,7 +54,7 @@ public class BookDetailsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if(getArguments() != null){
-            bookSelected = getArguments().getString(BOOK_KEY);
+            pagerBooks = getArguments().getParcelable(BOOK_KEY);
         }
     }
 
@@ -66,7 +67,7 @@ public class BookDetailsFragment extends Fragment {
         button = view.findViewById(R.id.button);
         editText = view.findViewById(R.id.searchBar);
 
-        //displayBook(bookSelected);
+        displayBook(pagerBooks);
 
         return view;
     }
