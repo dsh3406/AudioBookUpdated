@@ -136,14 +136,6 @@ public class BookListFragment extends Fragment {
             });
             ((BookInterface) c).searchBook(bookArray);
 
-            for(int j = 0; j < bookArray.length(); j++){
-                try {
-                    pagerBook = new Book(bookArray.getJSONObject(j));
-                    ((BookInterface) c).getBooks(pagerBook);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
             return false;
         }
     });

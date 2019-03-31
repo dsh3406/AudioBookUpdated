@@ -48,12 +48,12 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
 
     @Override
     public void bookSelected(Book bookObj) {
-            detailsFragment.displayBook(bookObj);
+        detailsFragment.displayBook(bookObj);
     }
 
     @Override
     public void searchBook(JSONArray bookArray) {
-        detailsFragment.searchBook(bookArray);
+            detailsFragment.searchBook(bookArray);
     }
 
     @Override

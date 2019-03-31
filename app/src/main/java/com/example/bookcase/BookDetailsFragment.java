@@ -47,6 +47,7 @@ public class BookDetailsFragment extends Fragment {
         Bundle bundle = new Bundle();
         bundle.putParcelable(BOOK_KEY, bookList);
         fragment.setArguments(bundle);
+        Log.d("Passed on Book", fragment.getArguments().getParcelable(BOOK_KEY).toString());
         return fragment;
     }
 
@@ -66,8 +67,9 @@ public class BookDetailsFragment extends Fragment {
         imageView = view.findViewById(R.id.bookImage);
         button = view.findViewById(R.id.button);
         editText = view.findViewById(R.id.searchBar);
-
-        displayBook(pagerBooks);
+        if(getArguments() != null) {
+            displayBook(pagerBooks);
+        }
 
         return view;
     }
@@ -75,6 +77,7 @@ public class BookDetailsFragment extends Fragment {
     public void displayBook(Book bookObj){
         author = bookObj.getAuthor();
         title = bookObj.getTitle(); publishyr = bookObj.getPublished();
+        Log.d("what is title ", title);
         textView.setText(" \"" + title + "\" "); textView.append(", " + author); textView.append(", " + publishyr);
         textView.setTextSize(23);
         String imageURL = bookObj.getCoverURL();
@@ -111,6 +114,9 @@ public class BookDetailsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 searchText = editText.getText().toString();
+                if(searchText.equals(null)){
+                    textView.setText("Empty Search");
+                }
                 Log.d("Title", searchText);
                 for (int i = 0; i < bookArray.length(); i++) {
                     try {
@@ -126,7 +132,6 @@ public class BookDetailsFragment extends Fragment {
                     } else if (searchText.equals(publishyrArray.get(i))) {
                         displayBook(books);
                     }
-
                 }
             }
         });
