@@ -79,7 +79,7 @@ public class BookDetailsFragment extends Fragment {
         title = bookObj.getTitle(); publishyr = bookObj.getPublished();
         Log.d("what is title ", title);
         textView.setText(" \"" + title + "\" "); textView.append(", " + author); textView.append(", " + publishyr);
-        textView.setTextSize(23);
+        textView.setTextSize(20);
         String imageURL = bookObj.getCoverURL();
         Picasso.get().load(imageURL).into(imageView);
     }
@@ -114,7 +114,7 @@ public class BookDetailsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 searchText = editText.getText().toString();
-                if(searchText.equals(null)){
+                if(searchText.equals(" ")){
                     textView.setText("Empty Search");
                 }
                 Log.d("Title", searchText);

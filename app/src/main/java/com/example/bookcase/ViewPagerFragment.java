@@ -115,11 +115,11 @@ public class ViewPagerFragment extends Fragment {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            for(int i = 0; i < bookArray.length(); i++){
+            for (int i = 0; i < bookArray.length(); i++) {
                 try {
-                     bookObj = new Book(bookArray.getJSONObject(i));
+                    JSONObject jsonData = bookArray.getJSONObject(i);
+                    bookObj = new Book(jsonData);
                     newFragment = BookDetailsFragment.newInstance(bookObj);
-                   // newFragment.displayBook(bookObj);
                     pagerAdapter.add(newFragment);
 
                     //Log.d("Book ", bookArray.getString(i));
@@ -128,16 +128,9 @@ public class ViewPagerFragment extends Fragment {
                 }
             }
             viewPager.setAdapter(pagerAdapter);
-
             return false;
         }
     });
-
-    public void getBooks(Book bookObj){
-
-
-        //pagerAdapter.notifyDataSetChanged();
-    }
 
     class PagerAdapter extends FragmentStatePagerAdapter{
 

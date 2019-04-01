@@ -61,7 +61,7 @@ public class BookListFragment extends Fragment {
     ListView listView;
     Context c;
     ArrayList<String> bookList;
-    Book books; Book pagerBook;
+    Book books;
     JSONArray bookArray;
 
     @Override
@@ -80,8 +80,8 @@ public class BookListFragment extends Fragment {
     public void downloadBook() {
         new Thread() {
             public void run() {
-                String urlString = "https://kamorris.com/lab/audlib/booksearch.php";
                 try {
+                    String urlString = "https://kamorris.com/lab/audlib/booksearch.php";
                     URL url = new URL(urlString);
                     BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
                     StringBuilder builder = new StringBuilder();
@@ -114,11 +114,11 @@ public class BookListFragment extends Fragment {
                     JSONObject jsonData = bookArray.getJSONObject(i);
                     String title = jsonData.getString("title");
                     bookList.add(title);
-                    //Log.d("Book ", bookArray.getString(i));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
+
             ArrayAdapter<String> arrayAdapter = new ArrayAdapter(c, android.R.layout.simple_list_item_1, bookList);
             listView.setAdapter(arrayAdapter);
 
@@ -130,7 +130,6 @@ public class BookListFragment extends Fragment {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    //books = (Book) parent.getItemAtPosition(position);
                     ((BookInterface) c).bookSelected(books);
                 }
             });
@@ -153,9 +152,7 @@ public class BookListFragment extends Fragment {
     }
 
     public interface BookInterface {
-        // TODO: Update argument type and name
         void bookSelected(Book bookObj);
         void searchBook(JSONArray bookArray);
-        void getBooks(Book bookObj);
     }
 }
