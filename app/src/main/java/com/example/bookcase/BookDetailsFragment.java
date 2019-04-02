@@ -47,7 +47,7 @@ public class BookDetailsFragment extends Fragment {
         Bundle bundle = new Bundle();
         bundle.putParcelable(BOOK_KEY, bookList);
         fragment.setArguments(bundle);
-        Log.d("Passed on Book", fragment.getArguments().getParcelable(BOOK_KEY).toString());
+        //Log.d("Passed on Book", fragment.getArguments().getParcelable(BOOK_KEY).toString());
         return fragment;
     }
 
@@ -77,7 +77,6 @@ public class BookDetailsFragment extends Fragment {
     public void displayBook(Book bookObj){
         author = bookObj.getAuthor();
         title = bookObj.getTitle(); publishyr = bookObj.getPublished();
-        Log.d("what is title ", title);
         textView.setText(" \"" + title + "\" "); textView.append(", " + author); textView.append(", " + publishyr);
         textView.setTextSize(20);
         String imageURL = bookObj.getCoverURL();
@@ -93,11 +92,6 @@ public class BookDetailsFragment extends Fragment {
         titleArray = new ArrayList<>(); authorArray = new ArrayList<>(); publishyrArray = new ArrayList<>();
 
         for(int i = 0; i < bookArray.length(); i++) {
-            try {
-                Log.d("Book Subset", bookArray.get(i).toString());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
             try {
                 jsonObject = bookArray.getJSONObject(i);
                 String title = jsonObject.getString("title");

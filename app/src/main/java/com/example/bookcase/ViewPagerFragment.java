@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,14 +35,6 @@ import java.util.ArrayList;
 
 
 public class ViewPagerFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     public ViewPagerFragment() {
         // Required empty public constructor
@@ -50,8 +43,6 @@ public class ViewPagerFragment extends Fragment {
     public static ViewPagerFragment newInstance(String param1, String param2) {
         ViewPagerFragment fragment = new ViewPagerFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -59,78 +50,37 @@ public class ViewPagerFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
 
     }
 
     ViewPager viewPager;
     PagerAdapter pagerAdapter;
     BookDetailsFragment newFragment;
-    JSONArray bookArray; Book bookObj;
+    Book bookObj;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_view_pager, container, false);
-        //textView = v.findViewById(R.id.textView);
-        downloadBook();
-
+        pagerAdapter = new PagerAdapter(getFragmentManager());
         viewPager = v.findViewById(R.id.viewPager);
+
         return v;
     }
 
-    public void downloadBook() {
-        new Thread() {
-            public void run() {
-                String urlString = "https://kamorris.com/lab/audlib/booksearch.php";
-                try {
-                    URL url = new URL(urlString);
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-                    StringBuilder builder = new StringBuilder();
-                    String tmpString;
-                    while ((tmpString = reader.readLine()) != null) {
-                        builder.append(tmpString);
-                    }
-                    Message msg = Message.obtain();
-                    msg.obj = builder.toString();
-                    urlHandler.sendMessage(msg);
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-    }
-
-    Handler urlHandler = new Handler(new Handler.Callback() {
-        @Override
-        public boolean handleMessage(Message msg) {
+    public void addPager(JSONArray bookArray){
+        for(int i = 0; i < bookArray.length(); i++){
             try {
-                bookArray = new JSONArray((String) msg.obj);
-                pagerAdapter = new PagerAdapter(getChildFragmentManager());
+                JSONObject pagerData = bookArray.getJSONObject(i);
+                bookObj = new Book(pagerData);
+                newFragment = BookDetailsFragment.newInstance(bookObj);
+                pagerAdapter.add(newFragment);
+                viewPager.setAdapter(pagerAdapter);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            for (int i = 0; i < bookArray.length(); i++) {
-                try {
-                    JSONObject jsonData = bookArray.getJSONObject(i);
-                    bookObj = new Book(jsonData);
-                    newFragment = BookDetailsFragment.newInstance(bookObj);
-                    pagerAdapter.add(newFragment);
-
-                    //Log.d("Book ", bookArray.getString(i));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            viewPager.setAdapter(pagerAdapter);
-            return false;
         }
-    });
+    }
 
     class PagerAdapter extends FragmentStatePagerAdapter{
 

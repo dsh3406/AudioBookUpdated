@@ -73,7 +73,6 @@ public class BookListFragment extends Fragment {
         bookList = new ArrayList<>();
         downloadBook();
 
-
         return v;
     }
 
@@ -133,6 +132,7 @@ public class BookListFragment extends Fragment {
                     ((BookInterface) c).bookSelected(books);
                 }
             });
+            ((BookInterface) c).getPager(bookArray);
             ((BookInterface) c).searchBook(bookArray);
 
             return false;
@@ -154,5 +154,6 @@ public class BookListFragment extends Fragment {
     public interface BookInterface {
         void bookSelected(Book bookObj);
         void searchBook(JSONArray bookArray);
+        void getPager(JSONArray bookArray);
     }
 }
