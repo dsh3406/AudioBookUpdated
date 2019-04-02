@@ -62,7 +62,6 @@ public class BookListFragment extends Fragment {
     Context c;
     ArrayList<String> bookList;
     Book books;
-    JSONArray bookArray;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -71,73 +70,36 @@ public class BookListFragment extends Fragment {
 
         listView = v.findViewById(R.id.bookList);
         bookList = new ArrayList<>();
-        downloadBook();
 
         return v;
     }
 
-    public void downloadBook() {
-        new Thread() {
-            public void run() {
-                try {
-                    String urlString = "https://kamorris.com/lab/audlib/booksearch.php";
-                    URL url = new URL(urlString);
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-                    StringBuilder builder = new StringBuilder();
-                    String tmpString;
-                    while ((tmpString = reader.readLine()) != null) {
-                        builder.append(tmpString);
-                    }
-                    Message msg = Message.obtain();
-                    msg.obj = builder.toString();
-                    urlHandler.sendMessage(msg);
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-    }
-
-    Handler urlHandler = new Handler(new Handler.Callback() {
-        @Override
-        public boolean handleMessage(Message msg) {
+    public void getBooks(final JSONArray bookArray){
+        for(int i = 0; i < bookArray.length(); i++){
             try {
-                bookArray = new JSONArray((String) msg.obj);
+                JSONObject jsonData = bookArray.getJSONObject(i);
+                String title = jsonData.getString("title");
+                bookList.add(title);
+                Log.d("Book", bookArray.get(i).toString());
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            for(int i = 0; i < bookArray.length(); i++){
+        }
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter(c, android.R.layout.simple_list_item_1, bookList);
+        listView.setAdapter(arrayAdapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 try {
-                    JSONObject jsonData = bookArray.getJSONObject(i);
-                    String title = jsonData.getString("title");
-                    bookList.add(title);
+                    books = new Book(bookArray.getJSONObject(position));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                ((BookInterface) c).bookSelected(books);
             }
-
-            ArrayAdapter<String> arrayAdapter = new ArrayAdapter(c, android.R.layout.simple_list_item_1, bookList);
-            listView.setAdapter(arrayAdapter);
-
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    try {
-                        books = new Book(bookArray.getJSONObject(position));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    ((BookInterface) c).bookSelected(books);
-                }
-            });
-            ((BookInterface) c).getPager(bookArray);
-            ((BookInterface) c).searchBook(bookArray);
-
-            return false;
-        }
-    });
+        });
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -153,7 +115,5 @@ public class BookListFragment extends Fragment {
 
     public interface BookInterface {
         void bookSelected(Book bookObj);
-        void searchBook(JSONArray bookArray);
-        void getPager(JSONArray bookArray);
     }
 }
