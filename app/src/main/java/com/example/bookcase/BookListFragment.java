@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
@@ -60,7 +61,7 @@ public class BookListFragment extends Fragment {
 
     ListView listView;
     Context c;
-    ArrayList<String> bookList;
+    ArrayList<Book> bookList;
     Book books;
 
     @Override
@@ -70,35 +71,36 @@ public class BookListFragment extends Fragment {
 
         listView = v.findViewById(R.id.bookList);
         bookList = new ArrayList<>();
+        Button button = ((MainActivity) getContext()).findViewById(R.id.searchButton);
 
         return v;
     }
 
     public void getBooks(final JSONArray bookArray){
+        BookAdapter adapter = new BookAdapter(c, bookList);
+        //ArrayAdapter<String> arrayAdapter = new ArrayAdapter(c, android.R.layout.simple_list_item_1, bookList);
         for(int i = 0; i < bookArray.length(); i++){
             try {
                 JSONObject jsonData = bookArray.getJSONObject(i);
-                String title = jsonData.getString("title");
-                bookList.add(title);
+                bookList.add(new Book(bookArray.getJSONObject(i)));
+                adapter.notifyDataSetChanged();
                 Log.d("Book", bookArray.get(i).toString());
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter(c, android.R.layout.simple_list_item_1, bookList);
-        listView.setAdapter(arrayAdapter);
+        listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                try {
-                    books = new Book(bookArray.getJSONObject(position));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                books = bookList.get(position);
                 ((BookInterface) c).bookSelected(books);
             }
         });
+    }
+
+    private void updateList(){
     }
 
     @Override
