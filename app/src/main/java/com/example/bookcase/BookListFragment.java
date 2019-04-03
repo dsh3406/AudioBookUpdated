@@ -26,6 +26,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -63,6 +64,7 @@ public class BookListFragment extends Fragment {
     Context c;
     ArrayList<Book> bookList;
     Book books;
+    BookAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -71,36 +73,41 @@ public class BookListFragment extends Fragment {
 
         listView = v.findViewById(R.id.bookList);
         bookList = new ArrayList<>();
-        Button button = ((MainActivity) getContext()).findViewById(R.id.searchButton);
 
         return v;
     }
 
     public void getBooks(final JSONArray bookArray){
-        BookAdapter adapter = new BookAdapter(c, bookList);
         //ArrayAdapter<String> arrayAdapter = new ArrayAdapter(c, android.R.layout.simple_list_item_1, bookList);
         for(int i = 0; i < bookArray.length(); i++){
             try {
                 JSONObject jsonData = bookArray.getJSONObject(i);
                 bookList.add(new Book(bookArray.getJSONObject(i)));
-                adapter.notifyDataSetChanged();
-                Log.d("Book", bookArray.get(i).toString());
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+        Log.d("Book List", bookList.toString());
+        updateList();
+    }
+
+    private void updateList(){
+        final ArrayList<Book> newList = new ArrayList<>();
+        newList.addAll(bookList);
+        Log.d("Books", newList.toString());
+        adapter = new BookAdapter(c, newList);
+        //adapter.notifyDataSetChanged();
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                books = bookList.get(position);
+                books = newList.get(position);
                 ((BookInterface) c).bookSelected(books);
             }
         });
-    }
-
-    private void updateList(){
+        bookList.clear();
+        adapter.notifyDataSetChanged();
     }
 
     @Override
