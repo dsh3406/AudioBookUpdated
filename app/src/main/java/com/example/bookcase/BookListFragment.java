@@ -31,15 +31,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link BookListFragment.BookInterface} interface
- * to handle interaction events.
- * Use the {@link BookListFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class BookListFragment extends Fragment {
 
     private BookInterface mListener;
@@ -78,10 +69,10 @@ public class BookListFragment extends Fragment {
     }
 
     public void getBooks(final JSONArray bookArray){
+        bookList.clear();
         //ArrayAdapter<String> arrayAdapter = new ArrayAdapter(c, android.R.layout.simple_list_item_1, bookList);
         for(int i = 0; i < bookArray.length(); i++){
             try {
-                JSONObject jsonData = bookArray.getJSONObject(i);
                 bookList.add(new Book(bookArray.getJSONObject(i)));
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -92,22 +83,17 @@ public class BookListFragment extends Fragment {
     }
 
     private void updateList(){
-        final ArrayList<Book> newList = new ArrayList<>();
-        newList.addAll(bookList);
-        Log.d("Books", newList.toString());
-        adapter = new BookAdapter(c, newList);
-        //adapter.notifyDataSetChanged();
+        adapter = new BookAdapter(c, bookList);
+        adapter.notifyDataSetChanged();
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                books = newList.get(position);
+                books = bookList.get(position);
                 ((BookInterface) c).bookSelected(books);
             }
         });
-        bookList.clear();
-        adapter.notifyDataSetChanged();
     }
 
     @Override

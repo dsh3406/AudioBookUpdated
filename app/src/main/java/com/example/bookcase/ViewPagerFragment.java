@@ -71,11 +71,12 @@ public class ViewPagerFragment extends Fragment {
     public void addPager(JSONArray bookArray){
         for(int i = 0; i < bookArray.length(); i++) {
             try {
+                pagerAdapter.getItemPosition(i);
+                pagerAdapter.notifyDataSetChanged();
                 JSONObject pagerData = bookArray.getJSONObject(i);
                 bookObj = new Book(pagerData);
                 newFragment = BookDetailsFragment.newInstance(bookObj);
                 pagerAdapter.add(newFragment);
-                pagerAdapter.notifyDataSetChanged();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
