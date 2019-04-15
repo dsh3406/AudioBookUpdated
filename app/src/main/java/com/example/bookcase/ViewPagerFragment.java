@@ -56,32 +56,30 @@ public class ViewPagerFragment extends Fragment {
     ViewPager viewPager;
     PagerAdapter pagerAdapter;
     BookDetailsFragment newFragment;
-    Book bookObj;
+    Book bookObj; ArrayList<Book> books;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_view_pager, container, false);
-        pagerAdapter = new PagerAdapter(getChildFragmentManager());
+        pagerAdapter = new PagerAdapter(getFragmentManager());
+        books = new ArrayList<>();
         viewPager = v.findViewById(R.id.viewPager);
+        viewPager.setAdapter(pagerAdapter);
 
         return v;
     }
 
-    public void addPager(JSONArray bookArray){
-        for(int i = 0; i < bookArray.length(); i++) {
-            try {
-                pagerAdapter.getItemPosition(i);
-                pagerAdapter.notifyDataSetChanged();
-                JSONObject pagerData = bookArray.getJSONObject(i);
-                bookObj = new Book(pagerData);
-                newFragment = BookDetailsFragment.newInstance(bookObj);
-                pagerAdapter.add(newFragment);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+    public void addPager(final ArrayList bookArray){
+        books.clear();
+        books.addAll(bookArray);
+        for(int i = 0; i < books.size(); i++) {
+            bookObj = books.get(i);
+            newFragment = BookDetailsFragment.newInstance(bookObj);
+            pagerAdapter.add(newFragment);
         }
-        viewPager.setAdapter(pagerAdapter);
+        pagerAdapter.getItemPosition(bookObj);
+        pagerAdapter.notifyDataSetChanged();
     }
 
     class PagerAdapter extends FragmentStatePagerAdapter{

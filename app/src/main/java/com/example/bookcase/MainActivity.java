@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     BookListFragment listFragment;
     EditText searchText; Button button;
     JSONArray bookArray; String searchBook;
+    ArrayList<Book> bookList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         setContentView(R.layout.activity_main);
         searchText = findViewById(R.id.searchText);
         button = findViewById(R.id.searchButton);
+        bookList = new ArrayList<>();
 
         singlePane = findViewById(R.id.container_2) == null;
         detailsFragment = new BookDetailsFragment();
@@ -109,10 +111,18 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            bookList.clear();
+            for(int i = 0; i < bookArray.length(); i++){
+                try {
+                    bookList.add(new Book(bookArray.getJSONObject(i)));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
             if(singlePane) {
-                viewPagerFragment.addPager(bookArray);
+                viewPagerFragment.addPager(bookList);
             } else {
-                listFragment.getBooks(bookArray);
+                listFragment.getBooks(bookList);
             }
             return false;
         }
