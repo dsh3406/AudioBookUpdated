@@ -31,9 +31,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import edu.temple.audiobookplayer.AudiobookService;
+
 public class BookListFragment extends Fragment {
 
     private BookInterface mListener;
+    AudiobookService.MediaControlBinder mediaControlBinder;
 
     public BookListFragment() {
         // Required empty public constructor

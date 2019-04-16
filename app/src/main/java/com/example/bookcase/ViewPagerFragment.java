@@ -77,9 +77,9 @@ public class ViewPagerFragment extends Fragment {
             bookObj = books.get(i);
             newFragment = BookDetailsFragment.newInstance(bookObj);
             pagerAdapter.add(newFragment);
+            pagerAdapter.notifyDataSetChanged();
         }
         pagerAdapter.getItemPosition(bookObj);
-        pagerAdapter.notifyDataSetChanged();
     }
 
     class PagerAdapter extends FragmentStatePagerAdapter{

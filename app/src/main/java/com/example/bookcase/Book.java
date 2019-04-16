@@ -15,13 +15,14 @@ import java.util.ArrayList;
 
 
 public class Book implements Parcelable {
-    private int id;
-    private String title, author, coverURL, published;
+    public int id, duration;
+    public String title, author, coverURL, published;
 
     public Book(JSONObject jsonBook) throws JSONException {
         this.title = jsonBook.getString("title"); this.author = jsonBook.getString("author");
         this.coverURL = jsonBook.getString("cover_url");
         this.id = jsonBook.getInt("book_id"); this.published = jsonBook.getString("published");
+        this.duration = jsonBook.getInt("duration");
     }
 
     protected Book(Parcel in) {
@@ -64,8 +65,16 @@ public class Book implements Parcelable {
         this.coverURL = coverURL;
     }
 
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
     public int getId() {
         return id;
+    }
+
+    public int getDuration() {
+        return duration;
     }
 
     public String getPublished() {
