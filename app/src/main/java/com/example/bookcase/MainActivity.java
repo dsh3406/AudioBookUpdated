@@ -32,7 +32,7 @@ import java.util.List;
 
 import edu.temple.audiobookplayer.AudiobookService;
 
-public class MainActivity extends AppCompatActivity implements BookListFragment.BookInterface {
+public class MainActivity extends AppCompatActivity implements BookListFragment.BookInterface, BookDetailsFragment.BookDetailsInterface {
 
     boolean singlePane;
     BookDetailsFragment detailsFragment;
@@ -137,6 +137,28 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     public void bookSelected(Book bookObj) {
         detailsFragment.displayBook(bookObj);
     }
+
+    @Override
+    public void playBook(int id) {
+        mediaControlBinder.play(id);
+    }
+
+    @Override
+    public void pauseBook() {
+        mediaControlBinder.pause();
+    }
+
+    @Override
+    public void stopBook() {
+        mediaControlBinder.stop();
+    }
+
+    @Override
+    public void seekBook(int position) {
+        mediaControlBinder.seekTo(position);
+
+    }
+
 
     ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
