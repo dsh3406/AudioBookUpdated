@@ -57,15 +57,16 @@ public class ViewPagerFragment extends Fragment {
     PagerAdapter pagerAdapter;
     BookDetailsFragment newFragment;
     Book bookObj; ArrayList<Book> books;
+    ArrayList<BookDetailsFragment> bookFragments;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_view_pager, container, false);
-        pagerAdapter = new PagerAdapter(getFragmentManager());
+        pagerAdapter = new PagerAdapter(getChildFragmentManager());
         books = new ArrayList<>();
         viewPager = v.findViewById(R.id.viewPager);
-        viewPager.setAdapter(pagerAdapter);
+        bookFragments = new ArrayList<>();
 
         return v;
     }
@@ -76,10 +77,13 @@ public class ViewPagerFragment extends Fragment {
         for(int i = 0; i < books.size(); i++) {
             bookObj = books.get(i);
             newFragment = BookDetailsFragment.newInstance(bookObj);
+            bookFragments.add(newFragment);
             pagerAdapter.add(newFragment);
-            pagerAdapter.notifyDataSetChanged();
         }
+        pagerAdapter.addBooks(bookFragments);
         pagerAdapter.getItemPosition(bookObj);
+        pagerAdapter.notifyDataSetChanged();
+        viewPager.setAdapter(pagerAdapter);
     }
 
     class PagerAdapter extends FragmentStatePagerAdapter{
@@ -89,6 +93,12 @@ public class ViewPagerFragment extends Fragment {
         public PagerAdapter(FragmentManager fm) {
             super(fm);
             pagerFragments = new ArrayList<>();
+        }
+
+        public void addBooks(ArrayList<BookDetailsFragment> books) {
+            pagerFragments.clear();
+            pagerFragments.addAll(books);
+            notifyDataSetChanged();
         }
 
         public void add(BookDetailsFragment fragment){

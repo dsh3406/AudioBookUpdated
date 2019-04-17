@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         searchText = findViewById(R.id.searchText);
+        searchText.clearFocus();
         button = findViewById(R.id.searchButton);
         bookList = new ArrayList<>();
 
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
             addFragment(listFragment, R.id.container_1);
             addFragment(detailsFragment, R.id.container_2);
         } else {
+            addFragment(detailsFragment, R.id.container_3);
             addFragment(viewPagerFragment, R.id.container_3);
         }
 
@@ -133,6 +135,15 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         }
     });
 
+    Handler progressHandler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            Log.d("Progress", ":" + msg.what);
+            detailsFragment.updateSeekbar(msg.what);
+            return false;
+        }
+    });
+
     @Override
     public void bookSelected(Book bookObj) {
         detailsFragment.displayBook(bookObj);
@@ -141,6 +152,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     @Override
     public void playBook(int id) {
         mediaControlBinder.play(id);
+        mediaControlBinder.setProgressHandler(progressHandler);
     }
 
     @Override
@@ -156,7 +168,11 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     @Override
     public void seekBook(int position) {
         mediaControlBinder.seekTo(position);
+    }
 
+    @Override
+    public void progressHandler() {
+        mediaControlBinder.setProgressHandler(progressHandler);
     }
 
 

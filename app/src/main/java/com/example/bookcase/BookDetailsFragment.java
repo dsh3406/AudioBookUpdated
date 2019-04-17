@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,7 +44,7 @@ public class BookDetailsFragment extends Fragment {
     String title, author, publishyr;
     public static final String BOOK_KEY = "myBook";
     Book pagerBooks; ImageButton playButton, stopButton, pauseButton;
-    SeekBar seekBar; ProgressBar progressBar; TextView progressText;
+    SeekBar seekBar; TextView progressText;
 
     public static BookDetailsFragment newInstance(Book bookList) {
         BookDetailsFragment fragment = new BookDetailsFragment();
@@ -71,7 +72,6 @@ public class BookDetailsFragment extends Fragment {
         stopButton = view.findViewById(R.id.stopButton);
         pauseButton = view.findViewById(R.id.pauseButton);
         seekBar = view.findViewById(R.id.seekBar);
-        progressBar = view.findViewById(R.id.progressBar);
         progressText = view.findViewById(R.id.progressText);
         if(getArguments() != null) {
             displayBook(pagerBooks);
@@ -84,7 +84,7 @@ public class BookDetailsFragment extends Fragment {
         author = bookObj.getAuthor();
         title = bookObj.getTitle(); publishyr = bookObj.getPublished();
         textView.setText(" \"" + title + "\" "); textView.append(", " + author); textView.append(", " + publishyr);
-        textView.setTextSize(20);
+        textView.setTextSize(15);
         textView.setTextColor(Color.BLACK);
         String imageURL = bookObj.getCoverURL();
         Picasso.get().load(imageURL).into(imageView);
@@ -92,6 +92,7 @@ public class BookDetailsFragment extends Fragment {
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                seekBar.setMax(bookObj.getDuration());
                 ((BookDetailsInterface) c).playBook(bookObj.getId());
             }
         });
@@ -111,9 +112,10 @@ public class BookDetailsFragment extends Fragment {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                progressBar.setProgress(progress);
-                progressText.setText("" + progress + "%");
-                ((BookDetailsInterface) c).seekBook(progress);
+                if(fromUser) {
+                    progressText.setText("" + progress + "s");
+                    ((BookDetailsInterface) c).seekBook(progress);
+                }
             }
 
             @Override
@@ -127,6 +129,12 @@ public class BookDetailsFragment extends Fragment {
             }
         });
     }
+    public void updateSeekbar(int currentTime){
+        seekBar.setProgress(currentTime);
+        progressText.setText("" + currentTime + "s");
+    }
+
+
 
     @Override
     public void onAttach(Context context) {
@@ -145,6 +153,7 @@ public class BookDetailsFragment extends Fragment {
         void pauseBook();
         void stopBook();
         void seekBook(int position);
+        void progressHandler();
     }
 
 }
