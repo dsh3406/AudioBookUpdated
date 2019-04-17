@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SeekBar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -59,12 +60,11 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         viewPagerFragment = new ViewPagerFragment();
 
         bindService(new Intent(this, AudiobookService.class), serviceConnection, BIND_AUTO_CREATE);
-
         if(!singlePane){
             addFragment(listFragment, R.id.container_1);
             addFragment(detailsFragment, R.id.container_2);
         } else {
-            addFragment(detailsFragment, R.id.container_3);
+            addFragment(detailsFragment, R.id.container_3); //need this to avoid app crashing when pressed play button on view pager.
             addFragment(viewPagerFragment, R.id.container_3);
         }
 
@@ -138,12 +138,11 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     Handler progressHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
-            Log.d("Progress", ":" + msg.what);
             detailsFragment.updateSeekbar(msg.what);
             return false;
         }
     });
-
+    
     @Override
     public void bookSelected(Book bookObj) {
         detailsFragment.displayBook(bookObj);
@@ -152,7 +151,6 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     @Override
     public void playBook(int id) {
         mediaControlBinder.play(id);
-        mediaControlBinder.setProgressHandler(progressHandler);
     }
 
     @Override
@@ -171,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     }
 
     @Override
-    public void progressHandler() {
+    public void setProgress() {
         mediaControlBinder.setProgressHandler(progressHandler);
     }
 

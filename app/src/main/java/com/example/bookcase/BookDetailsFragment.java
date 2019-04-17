@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -57,6 +58,7 @@ public class BookDetailsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if(getArguments() != null){
             pagerBooks = getArguments().getParcelable(BOOK_KEY);
         }
@@ -89,11 +91,13 @@ public class BookDetailsFragment extends Fragment {
         String imageURL = bookObj.getCoverURL();
         Picasso.get().load(imageURL).into(imageView);
 
+        seekBar.setMax(bookObj.getDuration());
+
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                seekBar.setMax(bookObj.getDuration());
                 ((BookDetailsInterface) c).playBook(bookObj.getId());
+                ((BookDetailsInterface) c).setProgress();
             }
         });
         pauseButton.setOnClickListener(new View.OnClickListener() {
@@ -106,6 +110,7 @@ public class BookDetailsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 seekBar.setProgress(0);
+                progressText.setText("0s");
                 ((BookDetailsInterface) c).stopBook();
         }
         });
@@ -129,12 +134,13 @@ public class BookDetailsFragment extends Fragment {
             }
         });
     }
+
     public void updateSeekbar(int currentTime){
         seekBar.setProgress(currentTime);
+        Log.d("Max", ":" + seekBar.getMax());
+        Log.d("Progress", ":" + seekBar.getProgress());
         progressText.setText("" + currentTime + "s");
     }
-
-
 
     @Override
     public void onAttach(Context context) {
@@ -153,7 +159,7 @@ public class BookDetailsFragment extends Fragment {
         void pauseBook();
         void stopBook();
         void seekBook(int position);
-        void progressHandler();
+        void setProgress();
     }
 
 }

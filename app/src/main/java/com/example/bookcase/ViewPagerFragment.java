@@ -67,23 +67,18 @@ public class ViewPagerFragment extends Fragment {
         books = new ArrayList<>();
         viewPager = v.findViewById(R.id.viewPager);
         bookFragments = new ArrayList<>();
+        viewPager.setAdapter(pagerAdapter);
 
         return v;
     }
 
-    public void addPager(final ArrayList bookArray){
-        books.clear();
-        books.addAll(bookArray);
-        for(int i = 0; i < books.size(); i++) {
-            bookObj = books.get(i);
+    public void addPager(final ArrayList<Book> bookArray){
+        for(int i = 0; i < bookArray.size(); i++) {
+            bookObj = bookArray.get(i);
             newFragment = BookDetailsFragment.newInstance(bookObj);
             bookFragments.add(newFragment);
-            pagerAdapter.add(newFragment);
         }
         pagerAdapter.addBooks(bookFragments);
-        pagerAdapter.getItemPosition(bookObj);
-        pagerAdapter.notifyDataSetChanged();
-        viewPager.setAdapter(pagerAdapter);
     }
 
     class PagerAdapter extends FragmentStatePagerAdapter{
@@ -106,9 +101,10 @@ public class ViewPagerFragment extends Fragment {
         }
 
         @Override
-        public int getItemPosition(@NonNull Object object) {
-            return PagerAdapter.POSITION_NONE;
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
         }
+
 
         @Override
         public Fragment getItem(int i) {
