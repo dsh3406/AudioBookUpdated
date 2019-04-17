@@ -90,12 +90,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         new Thread() {
             public void run() {
                 try {
-                    String urlString;
-                    if(search.equals(" ")){
-                        urlString = "https://kamorris.com/lab/audlib/booksearch.php";
-                    } else {
-                        urlString = "https://kamorris.com/lab/audlib/booksearch.php?search=" + search;
-                    }
+                    String urlString = "https://kamorris.com/lab/audlib/booksearch.php?search=" + search;
                     URL url = new URL(urlString);
                     BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
                     StringBuilder builder = new StringBuilder();
