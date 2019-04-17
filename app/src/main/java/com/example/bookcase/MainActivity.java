@@ -90,7 +90,12 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         new Thread() {
             public void run() {
                 try {
-                    String urlString = "https://kamorris.com/lab/audlib/booksearch.php?search=" + search;
+                    String urlString;
+                    if(search.equals(" ")){
+                        urlString = "https://kamorris.com/lab/audlib/booksearch.php";
+                    } else {
+                        urlString = "https://kamorris.com/lab/audlib/booksearch.php?search=" + search;
+                    }
                     URL url = new URL(urlString);
                     BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
                     StringBuilder builder = new StringBuilder();
@@ -135,14 +140,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         }
     });
 
-    Handler progressHandler = new Handler(new Handler.Callback() {
-        @Override
-        public boolean handleMessage(Message msg) {
-            detailsFragment.updateSeekbar(msg.what);
-            return false;
-        }
-    });
-    
+
     @Override
     public void bookSelected(Book bookObj) {
         detailsFragment.displayBook(bookObj);
@@ -169,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     }
 
     @Override
-    public void setProgress() {
+    public void setProgress(Handler progressHandler) {
         mediaControlBinder.setProgressHandler(progressHandler);
     }
 

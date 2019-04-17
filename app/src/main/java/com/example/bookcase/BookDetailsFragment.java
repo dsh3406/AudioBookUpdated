@@ -97,7 +97,7 @@ public class BookDetailsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ((BookDetailsInterface) c).playBook(bookObj.getId());
-                ((BookDetailsInterface) c).setProgress();
+                ((BookDetailsInterface) c).setProgress(progressHandler);
             }
         });
         pauseButton.setOnClickListener(new View.OnClickListener() {
@@ -135,9 +135,16 @@ public class BookDetailsFragment extends Fragment {
         });
     }
 
+    Handler progressHandler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            updateSeekbar(msg.what);
+            return false;
+        }
+    });
+
     public void updateSeekbar(int currentTime){
         seekBar.setProgress(currentTime);
-        Log.d("Max", ":" + seekBar.getMax());
         Log.d("Progress", ":" + seekBar.getProgress());
         progressText.setText("" + currentTime + "s");
     }
@@ -159,7 +166,7 @@ public class BookDetailsFragment extends Fragment {
         void pauseBook();
         void stopBook();
         void seekBook(int position);
-        void setProgress();
+        void setProgress(Handler progressHandler);
     }
 
 }
