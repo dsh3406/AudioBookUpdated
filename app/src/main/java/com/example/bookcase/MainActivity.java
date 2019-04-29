@@ -3,6 +3,7 @@ package com.example.bookcase;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -23,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Array;
@@ -44,9 +46,11 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     ArrayList<Book> bookList;
     boolean connected;
     AudiobookService.MediaControlBinder mediaControlBinder;
+    String savedSearch;
+    SharedPreferences sharedPreferences;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         searchText = findViewById(R.id.searchText);
@@ -68,14 +72,22 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
             addFragment(viewPagerFragment, R.id.container_3);
         }
 
+        sharedPreferences = getPreferences(MODE_PRIVATE);
+        final SharedPreferences.Editor editor = sharedPreferences.edit();
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 searchBook = searchText.getText().toString();
+                editor.putString("SEARCH", searchBook);
+                editor.apply();
                 downloadBook(searchBook);
             }
         });
+
+        final String savedSearch = sharedPreferences.getString("SEARCH", "Default Value");
+        downloadBook(savedSearch);
+
     }
 
     public void addFragment(Fragment fragment, int id){
@@ -118,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
             bookList.clear();
             for(int i = 0; i < bookArray.length(); i++){
                 try {
@@ -147,6 +160,11 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     }
 
     @Override
+    public void playBookFile(File file) {
+        mediaControlBinder.play(file);
+    }
+
+    @Override
     public void pauseBook() {
         mediaControlBinder.pause();
     }
@@ -166,6 +184,15 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         mediaControlBinder.setProgressHandler(progressHandler);
     }
 
+    @Override
+    public void playBookPosition(int id, int position) {
+        mediaControlBinder.play(id, position);
+    }
+
+    @Override
+    public void playBookFilePosition(File file, int position) {
+        mediaControlBinder.play(file, position);
+    }
 
     ServiceConnection serviceConnection = new ServiceConnection() {
         @Override

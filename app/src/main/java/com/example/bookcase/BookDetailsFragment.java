@@ -1,11 +1,14 @@
 package com.example.bookcase;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,6 +30,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 import edu.temple.audiobookplayer.AudiobookService;
@@ -41,11 +53,12 @@ public class BookDetailsFragment extends Fragment {
     }
 
     TextView textView;
-    ImageView imageView;
+    ImageView imageView; int currentTime;
     String title, author, publishyr;
     public static final String BOOK_KEY = "myBook";
-    Book pagerBooks; ImageButton playButton, stopButton, pauseButton;
-    SeekBar seekBar; TextView progressText;
+    Book pagerBooks; ImageButton playButton, stopButton, pauseButton; Button downloadButton, deleteButton;
+    SeekBar seekBar; TextView progressText; File file; boolean first, second;
+    SharedPreferences preferences;
 
     public static BookDetailsFragment newInstance(Book bookList) {
         BookDetailsFragment fragment = new BookDetailsFragment();
@@ -65,6 +78,11 @@ public class BookDetailsFragment extends Fragment {
     }
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_book_details, container, false);
@@ -73,12 +91,17 @@ public class BookDetailsFragment extends Fragment {
         playButton = view.findViewById(R.id.playButton);
         stopButton = view.findViewById(R.id.stopButton);
         pauseButton = view.findViewById(R.id.pauseButton);
+        downloadButton = view.findViewById(R.id.downloadButton);
+        deleteButton = view.findViewById(R.id.deleteButton);
         seekBar = view.findViewById(R.id.seekBar);
         progressText = view.findViewById(R.id.progressText);
+        preferences = this.getActivity().getPreferences(Context.MODE_PRIVATE);
+        first = true;
+
         if(getArguments() != null) {
             displayBook(pagerBooks);
+            Log.d("Displayed book", pagerBooks.getTitle());
         }
-
         return view;
     }
 
@@ -93,26 +116,88 @@ public class BookDetailsFragment extends Fragment {
 
         seekBar.setMax(bookObj.getDuration());
 
+        final SharedPreferences.Editor editor = preferences.edit();
+        final String savedBook = preferences.getString("SAVED_BOOK", "Deafult");
+       // if((bookObj.getTitle()).equals(savedBook)) {
+        //    currentTime = preferences.getInt("CURRENT_PROGRESS", 0);
+        //}
+        if(first == true){
+            currentTime = preferences.getInt("CURRENT_PROGRESS", 0);
+        } else{
+            currentTime = preferences.getInt("PROGRESS_2", 0);
+        }
+
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((BookDetailsInterface) c).playBook(bookObj.getId());
+                Log.d("Current Time", String.valueOf(currentTime));
+                if(file != null){
+                    Toast.makeText(getActivity(), "Playing Audio Book File", Toast.LENGTH_SHORT).show();
+                    //((BookDetailsInterface) c).playBookFile(file);
+                    ((BookDetailsInterface) c).playBookFilePosition(file, currentTime);
+                }else {
+                    Toast.makeText(getActivity(), "Streaming Audio Book", Toast.LENGTH_SHORT).show();
+                    //((BookDetailsInterface) c).playBook(bookObj.getId());
+                    ((BookDetailsInterface) c).playBookPosition(bookObj.getId(), currentTime);
+                }
                 ((BookDetailsInterface) c).setProgress(progressHandler);
             }
+
         });
         pauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(first == true) {
+                    editor.putInt("CURRENT_PROGRESS", seekBar.getProgress());
+                    //editor.putString("SAVED_BOOK", bookObj.getTitle());
+                    first = false;
+                    second = true;
+                }
+                else {
+                    editor.putInt("PROGRESS_2", seekBar.getProgress());
+                    second = false;
+                    first = true;
+                }
+                editor.apply();
+                Log.d("First", String.valueOf(first));
                 ((BookDetailsInterface) c).pauseBook();
             }
         });
         stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(first == true) {
+                    editor.putInt("CURRENT_PROGRESS", 0);
+                }
+                else {
+                    editor.putInt("PROGRESS_2", 0);
+                }
+
+                editor.apply();
                 seekBar.setProgress(0);
                 progressText.setText("0s");
                 ((BookDetailsInterface) c).stopBook();
         }
+        });
+        downloadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), "Downloading...", Toast.LENGTH_LONG).show();
+                int bookId = bookObj.getId();
+                downloadBook(bookId);
+            }
+        });
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(file != null) {
+                    file.delete();
+                    file = null;
+                    Toast.makeText(getActivity(), "File Deleted", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), "File does not exist", Toast.LENGTH_SHORT).show();
+                }
+            }
         });
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -121,6 +206,7 @@ public class BookDetailsFragment extends Fragment {
                     progressText.setText("" + progress + "s");
                     ((BookDetailsInterface) c).seekBook(progress);
                 }
+
             }
 
             @Override
@@ -149,6 +235,34 @@ public class BookDetailsFragment extends Fragment {
         progressText.setText("" + currentTime + "s");
     }
 
+    public void downloadBook(final int search) {
+        new Thread() {
+            public void run() {
+                try {
+                    String urlString = "https://kamorris.com/lab/audlib/download.php?id=" + search;
+                    URL url = new URL(urlString);
+                    InputStream inputStream = url.openStream();
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    byte[] buffer = new byte[4096];
+                    int num;
+                    while((num = inputStream.read(buffer)) > 0){
+                        byteArrayOutputStream.write(buffer, 0, num);
+                    }
+                    file = new File(getActivity().getFilesDir(), String.valueOf(search));
+                    FileOutputStream fileOutputStream = new FileOutputStream(file);
+                    fileOutputStream.write(byteArrayOutputStream.toByteArray());
+
+                    Log.d("File downloaded", file.toString());
+
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -163,10 +277,13 @@ public class BookDetailsFragment extends Fragment {
 
     public interface BookDetailsInterface{
         void playBook(int id);
+        void playBookFile(File file);
         void pauseBook();
         void stopBook();
         void seekBook(int position);
         void setProgress(Handler progressHandler);
+        void playBookPosition(int id, int position);
+        void playBookFilePosition(File file, int position);
     }
 
 }

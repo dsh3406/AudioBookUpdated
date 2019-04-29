@@ -103,4 +103,30 @@
         app:layout_constraintHorizontal_bias="0.52"
         app:layout_constraintStart_toEndOf="@+id/playButton" />
 
+    <Button
+        android:id="@+id/downloadButton"
+        android:layout_width="104dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="64dp"
+        android:layout_marginEnd="4dp"
+        android:text="Download"
+        android:background="@android:color/transparent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.735"
+        app:layout_constraintStart_toEndOf="@+id/stopButton" />
+
+    <Button
+        android:id="@+id/deleteButton"
+        android:layout_width="104dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="64dp"
+        android:text="Delete"
+        android:background="@android:color/transparent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/seekBar"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </android.support.constraint.ConstraintLayout>

@@ -40,13 +40,6 @@ public class ViewPagerFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static ViewPagerFragment newInstance(String param1, String param2) {
-        ViewPagerFragment fragment = new ViewPagerFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

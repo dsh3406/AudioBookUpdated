@@ -83,7 +83,6 @@ public class BookListFragment extends Fragment {
                 ((BookInterface) c).bookSelected(books);
             }
         });
-        //Log.d("Book List", bookList.toString());
     }
 
     @Override

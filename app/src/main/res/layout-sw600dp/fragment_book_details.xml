@@ -6,6 +6,34 @@
     android:layout_height="match_parent"
     tools:context=".BookDetailsFragment">
 
+    <Button
+        android:id="@+id/deleteButton"
+        android:layout_width="104dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="64dp"
+        android:layout_marginBottom="4dp"
+        android:background="@android:color/transparent"
+        android:text="Delete"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/seekBar"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/downloadButton"
+        android:layout_width="104dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="64dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
+        android:background="@android:color/transparent"
+        android:text="Download"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.735"
+        app:layout_constraintStart_toEndOf="@+id/stopButton" />
+
     <TextView
         android:id="@+id/bookTitle"
         android:layout_width="0dp"
