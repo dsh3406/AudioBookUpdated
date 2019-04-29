@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
             }
         });
 
-        final String savedSearch = sharedPreferences.getString("SEARCH", "Default Value");
+        savedSearch = sharedPreferences.getString("SEARCH", "");
         downloadBook(savedSearch);
 
     }

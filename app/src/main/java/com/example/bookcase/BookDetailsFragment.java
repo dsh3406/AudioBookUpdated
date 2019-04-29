@@ -37,6 +37,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ public class BookDetailsFragment extends Fragment {
     String title, author, publishyr;
     public static final String BOOK_KEY = "myBook";
     Book pagerBooks; ImageButton playButton, stopButton, pauseButton; Button downloadButton, deleteButton;
-    SeekBar seekBar; TextView progressText; File file; boolean first, second;
+    SeekBar seekBar; TextView progressText; File file;
     SharedPreferences preferences;
 
     public static BookDetailsFragment newInstance(Book bookList) {
@@ -96,7 +97,6 @@ public class BookDetailsFragment extends Fragment {
         seekBar = view.findViewById(R.id.seekBar);
         progressText = view.findViewById(R.id.progressText);
         preferences = this.getActivity().getPreferences(Context.MODE_PRIVATE);
-        first = true;
 
         if(getArguments() != null) {
             displayBook(pagerBooks);
@@ -117,19 +117,16 @@ public class BookDetailsFragment extends Fragment {
         seekBar.setMax(bookObj.getDuration());
 
         final SharedPreferences.Editor editor = preferences.edit();
-        final String savedBook = preferences.getString("SAVED_BOOK", "Deafult");
-       // if((bookObj.getTitle()).equals(savedBook)) {
-        //    currentTime = preferences.getInt("CURRENT_PROGRESS", 0);
-        //}
-        if(first == true){
-            currentTime = preferences.getInt("CURRENT_PROGRESS", 0);
-        } else{
-            currentTime = preferences.getInt("PROGRESS_2", 0);
-        }
 
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                currentTime = preferences.getInt("SAVED_PROGRESS" + bookObj.getId(), 0);
+                if(currentTime <= 10){
+                    currentTime = 0;
+                } else {
+                    currentTime = currentTime - 10;
+                }
                 Log.d("Current Time", String.valueOf(currentTime));
                 if(file != null){
                     Toast.makeText(getActivity(), "Playing Audio Book File", Toast.LENGTH_SHORT).show();
@@ -147,32 +144,15 @@ public class BookDetailsFragment extends Fragment {
         pauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(first == true) {
-                    editor.putInt("CURRENT_PROGRESS", seekBar.getProgress());
-                    //editor.putString("SAVED_BOOK", bookObj.getTitle());
-                    first = false;
-                    second = true;
-                }
-                else {
-                    editor.putInt("PROGRESS_2", seekBar.getProgress());
-                    second = false;
-                    first = true;
-                }
+                editor.putInt("SAVED_PROGRESS" + bookObj.getId(), seekBar.getProgress());
                 editor.apply();
-                Log.d("First", String.valueOf(first));
                 ((BookDetailsInterface) c).pauseBook();
             }
         });
         stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(first == true) {
-                    editor.putInt("CURRENT_PROGRESS", 0);
-                }
-                else {
-                    editor.putInt("PROGRESS_2", 0);
-                }
-
+                editor.putInt("SAVED_PROGRESS" + bookObj.getId(), 0);
                 editor.apply();
                 seekBar.setProgress(0);
                 progressText.setText("0s");
